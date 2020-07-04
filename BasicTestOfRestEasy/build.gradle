@@ -1,0 +1,20 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'war'
+//archivesBaseName = ''
+version = '1' 
+repositories {
+        mavenCentral()
+}
+dependencies {
+	// https://mvnrepository.com/artifact/org.jboss.resteasy/resteasy-jaxb-provider
+compile group: 'org.jboss.resteasy', name: 'resteasy-jaxb-provider', version: '3.0.16.Final'
+	
+	compile 'org.jboss.resteasy:resteasy-jaxrs:3.0.10.Final'
+	compile 'org.jboss.resteasy:resteasy-jaxb-provider:3.0.10.Final'
+	
+	// https://mvnrepository.com/artifact/org.jboss.resteasy/resteasy-jackson-provider
+compile group: 'org.jboss.resteasy', name: 'resteasy-jackson-provider', version: '2.2.1.GA'
+	
+	
+}  
