@@ -69,7 +69,7 @@
                 <div align="center" onclick="ClickSignUp()" class="g-signin2" data-onsuccess="onSignUp"></div>
         <br><br>
         
-        <p id="name" color = "red"></p>
+        <p id="name" style="color:red"></p>
     	
     </div>
         

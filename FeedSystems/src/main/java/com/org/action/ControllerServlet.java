@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -26,9 +28,11 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.appengine.api.datastore.Text;
 import com.org.dao.UserService;
 import com.org.dao.UserServiceImpl;
 import com.org.model.User;
+import com.org.model.UserFeeds;
 
 
 @Path("/")
@@ -73,28 +77,28 @@ public class ControllerServlet {
 	}
 	
 	
-	@Path("/Signup")
-	@GET
-	public String signUpPage() throws IOException
-	{
-		
-		InputStream st=servletContext.getResourceAsStream("/Signup.jsp");
-		BufferedReader buffReader = new BufferedReader(new InputStreamReader(st));
-
-		String string = new String();
-		String modifiedHtml = "";
-		while( (string = buffReader.readLine() ) != null){
-		modifiedHtml=modifiedHtml+string;
-		}
-
-		buffReader.close();
-		st.close();
-		
-		
-		
-		return modifiedHtml;
-		
-	}
+//	@Path("/Signup")
+//	@GET
+//	public String signUpPage() throws IOException
+//	{
+//		
+//		InputStream st=servletContext.getResourceAsStream("/Signup.jsp");
+//		BufferedReader buffReader = new BufferedReader(new InputStreamReader(st));
+//
+//		String string = new String();
+//		String modifiedHtml = "";
+//		while( (string = buffReader.readLine() ) != null){
+//		modifiedHtml=modifiedHtml+string;
+//		}
+//
+//		buffReader.close();
+//		st.close();
+//		
+//		
+//		
+//		return modifiedHtml;
+//		
+//	}
 	
 	@Path("/Dashboard")
 	@GET
@@ -159,16 +163,18 @@ public class ControllerServlet {
 				  String name = (String) payload.get("name");
 
 				  
-				  		User userAcc = dao.getUserByMail(email);
+				  		User user = dao.getUserByMail(email);
 				  		
-				  		if(userAcc == null) 
+				  		if(user == null) 
 				  		{
 				  			map.put("value","false");
 				  		}
 				  		else
 				  		{
-				  			session.setAttribute("email",userAcc.getEmail());
-							session.setAttribute("name",userAcc.getName());
+				  			session = request.getSession(true);
+				  			System.out.println("sign In"+user.getEmail());
+				  			session.setAttribute("email",user.getEmail());
+							session.setAttribute("name",user.getName());
 							map.put("value","true");
 				  		}
 						
@@ -179,13 +185,10 @@ public class ControllerServlet {
 				  System.out.println("Invalid ID token.");
 				}
 
-
 				String obj = new ObjectMapper().writeValueAsString(map);
 
 				return obj;
 
-		
-		
 	}
 	
 	
@@ -239,7 +242,8 @@ public class ControllerServlet {
 					
 					if(result == true)
 					{
-						System.out.println(users.getEmail());
+						session = request.getSession(true);
+						System.out.println("sign up test 2"+users.getEmail());
 						session.setAttribute("email",users.getEmail());
 						session.setAttribute("name",users.getName());
 						map.put("value","true");
@@ -260,11 +264,164 @@ public class ControllerServlet {
 
 				return obj;
 
-		
-		
 	}
 
 
+	@Path("/feedUpdate")
+	@POST
+	@Produces("application/json")
+	public String feedUpdate() throws IOException
+	{
+		
+		HttpSession session = request.getSession(false);		
+		HashMap<String,Object>map = new HashMap<String, Object>();
+		
+		String name = session.getAttribute("name").toString();
+		String email = session.getAttribute("email").toString();
+		Text statusFeed = new Text(request.getParameter("feedText"));
+		long milliseconds = System.currentTimeMillis();
+		
+		System.out.println(name+" "+email+" "+statusFeed+" "+milliseconds);
+		UserFeeds userfeed = new UserFeeds();
+		
+		userfeed.setId(null);
+		userfeed.setName(name);
+		userfeed.setMail(email);
+		userfeed.setFeed(statusFeed);
+		userfeed.setMilliseconds(milliseconds);
+		
+		boolean isFeedAdded = dao.addUserFeeds(userfeed);
+		
+		if(isFeedAdded == true)
+		{
+			UserFeeds getLastFeed = dao.getLastFeedOfTheUser(email);
+			
+			//System.out.println("test2 "+getLastFeed.getMail()+" "+getLastFeed.getMilliseconds()+" "+getLastFeed.getFeed());
+			
+			String date = dao.milliSecToDateConversion(getLastFeed.getMilliseconds());
+			String time = dao.milliSecToTimeConversion(getLastFeed.getMilliseconds());
+			
+			map.put("lastfeed",getLastFeed);
+			map.put("date",date);
+			map.put("time",time);
+		}
+		
+		String obj = new ObjectMapper().writeValueAsString(map);
+
+		return obj;
+		
+	}
+	
+	
+	@Path("/GetListOfMyFeeds")
+	@GET
+	@Produces("application/json")
+	public String listMyFeeds() throws IOException
+	{
+		
+		HttpSession session = request.getSession(false);		
+		HashMap<String,Object>map = new HashMap<String, Object>();
+		
+		String name = session.getAttribute("name").toString();
+		String email = session.getAttribute("email").toString();
+		
+		int index = 0;
+		
+		List<UserFeeds>myfeeds = dao.listMyFeeds(email);
+		List<String>date = new ArrayList<String>();
+		List<String>time = new ArrayList<String>();
+		
+		for(UserFeeds userfeeds : myfeeds)
+		{
+			time.add(index, dao.milliSecToTimeConversion(userfeeds.getMilliseconds()));
+			date.add(index, dao.milliSecToDateConversion(userfeeds.getMilliseconds()));
+			
+			index++;
+		}
+		
+		map.put("myfeeds",myfeeds);
+		map.put("time",time);
+		map.put("date",date);
+		
+		String obj = new ObjectMapper().writeValueAsString(map);
+
+		return obj;
+	}
+	
+	
+	@Path("/GetListOfAllFeeds")
+	@GET
+	@Produces("application/json")
+	public String listAllFeeds() throws IOException
+	{
+		
+		HttpSession session = request.getSession(false);		
+		HashMap<String,Object>map = new HashMap<String, Object>();
+		
+//		String name = session.getAttribute("name").toString();
+//		String email = session.getAttribute("email").toString();
+		
+		int index = 0;
+		
+		List<UserFeeds>allfeeds = dao.listAllFeeds();
+		List<String>date = new ArrayList<String>();
+		List<String>time = new ArrayList<String>();
+		
+		for(UserFeeds userfeeds : allfeeds)
+		{
+			time.add(index, dao.milliSecToTimeConversion(userfeeds.getMilliseconds()));
+			date.add(index, dao.milliSecToDateConversion(userfeeds.getMilliseconds()));
+			
+			index++;
+		}
+		
+		map.put("allfeeds",allfeeds);
+		map.put("time",time);
+		map.put("date",date);
+		
+		String obj = new ObjectMapper().writeValueAsString(map);
+
+		return obj;
+	}
+	
+	@Path("/GetAllUsers")
+	@GET
+	@Produces("application/json")
+	public String getAllUsers() throws IOException
+	{
+		
+		HttpSession session = request.getSession(false);		
+		HashMap<String,Object>map = new HashMap<String, Object>();
+		
+		
+		List<User>allusers = dao.getAllUsers();
+//		String name = session.getAttribute("name").toString();
+//		String email = session.getAttribute("email").toString();
+		
+//		int index = 0;
+//		
+//		List<UserFeeds>allfeeds = dao.listAllFeeds();
+//		List<String>date = new ArrayList<String>();
+//		List<String>time = new ArrayList<String>();
+//		
+//		for(UserFeeds userfeeds : allfeeds)
+//		{
+//			time.add(index, dao.milliSecToTimeConversion(userfeeds.getMilliseconds()));
+//			date.add(index, dao.milliSecToDateConversion(userfeeds.getMilliseconds()));
+//			
+//			index++;
+//		}
+//		
+//		map.put("allfeeds",allfeeds);
+//		map.put("time",time);
+//		map.put("date",date);
+		
+		map.put("allusers",allusers);
+		
+		String obj = new ObjectMapper().writeValueAsString(map);
+
+		return obj;
+	}
 	
 }
 

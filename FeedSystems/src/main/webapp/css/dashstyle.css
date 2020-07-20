@@ -1,0 +1,130 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    background-color: ghostwhite;
+}
+
+/*
+.logo {
+    font-size: 35px;
+    color: black;
+    text-align: center;
+    padding: 18px;
+    margin: 15px;
+    border: 3px deepskyblue solid;
+}
+*/
+
+.bluey span {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #fff;
+    background: #03a9f4;
+    padding: 10px;
+    margin: 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    display: inline;
+}
+*/
+
+#yourFeed{
+	display: inline;
+}
+
+.bluey{
+	display: inline;
+}
+
+.bluey input[type="submit"] {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #fff;
+    background: #03a9f4;
+    padding: 10px;
+    /*margin: 20px;*/
+    cursor: pointer;
+    border-radius: 5px;
+    display: inline;
+    float: right;
+}
+
+.main{
+	padding: 0px 160px;
+}
+
+.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+/* Style the buttons inside the tab */
+.tab span {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+.tab span:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab span.active {
+  background-color: #03a9f4;
+}
+
+.dynamicFeeds{
+	padding: 6px 12px;
+	border: 1px solid #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-top: none;
+}
+
+#sidehead{
+	padding : 0px 15px;
+}
+
+.yourFeedArea{
+width : 95%;
+}
+
+.sideBar {
+  height: 100%;
+  width: 160px;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color:  #ffffff;
+  overflow-x: hidden;
+  padding-top: 20px;
+}
+
+.sideBar span {
+  padding: 6px 8px 6px 16px;
+  text-decoration: none;
+  font-size: 10px;
+  color: #818181;
+  display: block;
+}
+
+.sideBar span:hover {
+  color: #111;
+}

@@ -1,0 +1,8 @@
+indexes:
+
+- kind: UserFeeds
+  ancestor: no
+  properties:
+  - name: mail
+  - name: milliseconds
+    direction: desc
