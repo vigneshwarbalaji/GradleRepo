@@ -38,6 +38,22 @@ body {
 	display: inline;
 }
 
+.blueyOne input[type="submit"] {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #fff;
+    background: #03a9f4;
+    padding: 10px;
+    margin: 0px 30px 0px 0px;
+    cursor: pointer;
+    border-radius: 5px;
+    display: inline;
+    float: right;
+}
+
+
+
 .bluey input[type="submit"] {
     background: transparent;
     border: none;
@@ -51,8 +67,15 @@ body {
     display: inline;
     float: right;
 }
+.home{
+	padding : 0px 15px;
+}
 
 .main{
+	padding: 0px 160px;
+}
+
+.mainTwo{
 	padding: 0px 160px;
 }
 

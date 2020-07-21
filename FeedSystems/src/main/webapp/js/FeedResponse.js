@@ -1,3 +1,7 @@
+$(".mainTwo").hide();
+$(".home").hide();
+
+
 function Feeds(evt, typeOfFeeds) {
   var i, tabcontent, tablinks;
   tabcontent = document.getElementsByClassName("tabcontent");
@@ -18,12 +22,14 @@ document.getElementById("defaultOpen").click();
 
 $(function () {
     $('#FeedSubmit').on('click', function () {
-
+    	
         $.ajax({
         	type: 'POST',
             url: '/feedUpdate',
             data :{ feedText : $('#yourFeed').val()},
             success: function (data, status, xhr) {
+            	$('#yourFeed').val('');
+            	
             	$('.tabcontent').prepend('<section class= "dynamicFeeds"><h3>'+data.lastfeed.name+'</h3><h6 style="color:#b3b3b3">'+data.date+' at '+data.time+'</h6><p>'+data.lastfeed.feed.value+'</p></section>')
             },
             dataType : 'json'
@@ -88,27 +94,61 @@ $(function () {
     	let email = $(this).closest('span').text();
     	
     	console.log(email);
+    	$(".main").hide();
+    	
+    	$(".mainTwo").show();
+		$(".home").show();
+    	
+    	$.ajax({
+    			type: 'POST',
+    			url: '/GetFeedsByMail',
+    			data :{ email : email},
+        success: function (data, status, xhr) {
+        	
+        	$(".mainTwo").empty();
+        	
+        	for(let i = 0 ; i <  data.fetchfeedsbymail.length;i++)
+            {
+            	$('.mainTwo').append('<section class= "dynamicFeeds"><h3>'+data.fetchfeedsbymail[i].name+'</h3><h6 style="color:#b3b3b3">'+data.date[i]+' at '+data.time[i]+'</h6><p>'+data.fetchfeedsbymail[i].feed.value+'</p></section>')
+            }
+        	
+        },
+        dataType : 'json'
+    });
     	
     });
 });
 
-//$(function () {
-//    $('.dynamicMailIds').on('click', function () {
-//
-//    	let email = $(this).closest('.dynamicMailIds').find('span').text().toString();
-//    	
-//    	console.log(email);
-////        $.ajax({
-////        	type: 'POST',
-////            url: '/feedUpdate',
-////            data :{ feedText : $('#yourFeed').val()},
-////            success: function (data, status, xhr) {
-////            	$('.tabcontent').prepend('<section class= "dynamicFeeds"><h3>'+data.lastfeed.name+'</h3><h6 style="color:#b3b3b3">'+data.date+' at '+data.time+'</h6><p>'+data.lastfeed.feed.value+'</p></section>')
-////            },
-////            dataType : 'json'
-////        });
-//    });
-//});
 
 
+$(function () {
+    $('.home').on('click', function () {
+    	
+    	$(".main").show();
+    	
+    	$(".mainTwo").hide();
+		$(".home").hide();
+    	
+    });
+});
 
+
+$(function () {
+    $('#logout').on('click', function () {
+    	
+        $.ajax({
+        	type: 'GET',
+            url: '/logout',
+
+            success: function (data, status, xhr) {
+            	
+            	if(data.value == 'true')
+            	{
+            		window.location.href = '/';
+    			}
+    			
+            },
+            dataType : 'json'
+        });
+    });
+});

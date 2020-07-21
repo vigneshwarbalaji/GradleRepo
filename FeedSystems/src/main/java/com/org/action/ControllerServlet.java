@@ -395,26 +395,6 @@ public class ControllerServlet {
 		
 		
 		List<User>allusers = dao.getAllUsers();
-//		String name = session.getAttribute("name").toString();
-//		String email = session.getAttribute("email").toString();
-		
-//		int index = 0;
-//		
-//		List<UserFeeds>allfeeds = dao.listAllFeeds();
-//		List<String>date = new ArrayList<String>();
-//		List<String>time = new ArrayList<String>();
-//		
-//		for(UserFeeds userfeeds : allfeeds)
-//		{
-//			time.add(index, dao.milliSecToTimeConversion(userfeeds.getMilliseconds()));
-//			date.add(index, dao.milliSecToDateConversion(userfeeds.getMilliseconds()));
-//			
-//			index++;
-//		}
-//		
-//		map.put("allfeeds",allfeeds);
-//		map.put("time",time);
-//		map.put("date",date);
 		
 		map.put("allusers",allusers);
 		
@@ -422,6 +402,69 @@ public class ControllerServlet {
 
 		return obj;
 	}
+	
+	
+	@Path("/GetFeedsByMail")
+	@POST
+	@Produces("application/json")
+	public String getFeedsByMail() throws IOException
+	{
+		
+//		HttpSession session = request.getSession(false);		
+		HashMap<String,Object>map = new HashMap<String, Object>();
+//		
+//		
+//		List<User>allusers = dao.getAllUsers();
+//		
+//		map.put("allusers",allusers);
+		int index = 0;
+		
+		String email = request.getParameter("email");
+		
+		List<UserFeeds>fetchfeedsbymail = dao.getFeedsByMailId(email);
+		List<String>date = new ArrayList<String>();
+		List<String>time = new ArrayList<String>();
+		
+		for(UserFeeds feedbymail : fetchfeedsbymail)
+		{
+			time.add(index, dao.milliSecToTimeConversion(feedbymail.getMilliseconds()));
+			date.add(index, dao.milliSecToDateConversion(feedbymail.getMilliseconds()));
+			
+			index++;
+		}
+		
+		map.put("fetchfeedsbymail",fetchfeedsbymail);
+		map.put("time",time);
+		map.put("date",date);
+		
+		String obj = new ObjectMapper().writeValueAsString(map);
+
+		return obj;
+	}
+	
+	
+	@GET
+	@Path("/logout")
+	@Produces("application/json")
+	public String logout() throws IOException
+	{
+		HttpSession session = request.getSession();
+		HashMap<String,Object>map = new HashMap<String, Object>();
+		
+		String email = session.getAttribute("email").toString();
+		
+		System.out.println("logout"+email);
+		
+		session.invalidate();
+		
+		map.put("value","true");
+		
+		String obj = new ObjectMapper().writeValueAsString(map);
+		
+		return obj;
+	
+	}
+	
 	
 }
 

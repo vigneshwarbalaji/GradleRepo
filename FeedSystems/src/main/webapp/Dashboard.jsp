@@ -9,6 +9,9 @@
 </head>
 <body>
 
+<div class = "blueyOne">
+    	<input type="submit" id= "logout" value= "logout">
+</div>
 
 <div class = "main">
 <textarea class="yourFeedArea" id = "yourFeed" rows="2" name="comment" 
@@ -31,12 +34,22 @@ placeholder = "Hi,What's on your mind?...">
 
 </div>
 </div>
-<div class = "sideBar">
 
+<div class = "mainTwo">
+
+<div id="MailFeeds" class="tabcontent">
+</div>
+
+</div>
+
+<div class = "sideBar">
+<div class= "home">Home</div>
 <h3 id = sidehead>All Users</h3>
 <div class = "AllUsers" id="users"></div>
   
 </div>
+
+
 	
 <script src="js/FeedResponse.js"></script>
 </body>
