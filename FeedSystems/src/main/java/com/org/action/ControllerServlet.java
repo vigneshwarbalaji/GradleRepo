@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
@@ -29,6 +30,7 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.appengine.api.datastore.Text;
+import com.google.appengine.api.search.query.ExpressionParser.negation_return;
 import com.org.dao.UserService;
 import com.org.dao.UserServiceImpl;
 import com.org.model.User;
@@ -280,8 +282,9 @@ public class ControllerServlet {
 		String email = session.getAttribute("email").toString();
 		Text statusFeed = new Text(request.getParameter("feedText"));
 		long milliseconds = System.currentTimeMillis();
+		int totalLikes = 0;
 		
-		System.out.println(name+" "+email+" "+statusFeed+" "+milliseconds);
+		System.out.println("update feed"+name+" "+email+" "+statusFeed+" "+milliseconds);
 		UserFeeds userfeed = new UserFeeds();
 		
 		userfeed.setId(null);
@@ -301,6 +304,7 @@ public class ControllerServlet {
 			String date = dao.milliSecToDateConversion(getLastFeed.getMilliseconds());
 			String time = dao.milliSecToTimeConversion(getLastFeed.getMilliseconds());
 			
+			map.put("totalLikes",totalLikes);
 			map.put("lastfeed",getLastFeed);
 			map.put("date",date);
 			map.put("time",time);
@@ -330,15 +334,34 @@ public class ControllerServlet {
 		List<UserFeeds>myfeeds = dao.listMyFeeds(email);
 		List<String>date = new ArrayList<String>();
 		List<String>time = new ArrayList<String>();
+		List<String>likedOrNot = new ArrayList<String>();
+		List<Integer>totalLikes = new ArrayList<Integer>();
 		
 		for(UserFeeds userfeeds : myfeeds)
 		{
+			List<String>personsWhoHadLikedTheFeed = new ArrayList<String>(userfeeds.getLikes());
+			
 			time.add(index, dao.milliSecToTimeConversion(userfeeds.getMilliseconds()));
 			date.add(index, dao.milliSecToDateConversion(userfeeds.getMilliseconds()));
 			
+			if(personsWhoHadLikedTheFeed.contains(email))
+			{
+				totalLikes.add(personsWhoHadLikedTheFeed.size());
+				likedOrNot.add("unlike");
+			}
+			else
+			{
+				totalLikes.add(personsWhoHadLikedTheFeed.size());
+				likedOrNot.add("like");
+			}
+			
 			index++;
+			
+			map.put("personsWhoLiked",personsWhoHadLikedTheFeed);
 		}
 		
+		map.put("totalLikes",totalLikes);
+		map.put("likedOrNot",likedOrNot);
 		map.put("myfeeds",myfeeds);
 		map.put("time",time);
 		map.put("date",date);
@@ -354,30 +377,47 @@ public class ControllerServlet {
 	@Produces("application/json")
 	public String listAllFeeds() throws IOException
 	{
-		
+		List<Integer>totalLikes = new ArrayList<Integer>();
 		HttpSession session = request.getSession(false);		
 		HashMap<String,Object>map = new HashMap<String, Object>();
 		
 //		String name = session.getAttribute("name").toString();
-//		String email = session.getAttribute("email").toString();
+		String email = session.getAttribute("email").toString();
 		
 		int index = 0;
 		
 		List<UserFeeds>allfeeds = dao.listAllFeeds();
 		List<String>date = new ArrayList<String>();
 		List<String>time = new ArrayList<String>();
+		List<String>likedOrNot = new ArrayList<String>();
 		
 		for(UserFeeds userfeeds : allfeeds)
 		{
+			List<String>personsWhoHadLikedTheFeed = new ArrayList<String>(userfeeds.getLikes()); 
 			time.add(index, dao.milliSecToTimeConversion(userfeeds.getMilliseconds()));
 			date.add(index, dao.milliSecToDateConversion(userfeeds.getMilliseconds()));
+			
+			if(personsWhoHadLikedTheFeed.contains(email))
+			{
+				totalLikes.add(personsWhoHadLikedTheFeed.size());
+				likedOrNot.add("unlike");
+			}
+			else
+			{
+				totalLikes.add(personsWhoHadLikedTheFeed.size());
+				likedOrNot.add("like");
+			}
+		
+			map.put("personsWhoLiked",personsWhoHadLikedTheFeed);
 			
 			index++;
 		}
 		
+		map.put("totalLikes",totalLikes);
 		map.put("allfeeds",allfeeds);
 		map.put("time",time);
 		map.put("date",date);
+		map.put("likedOrNot",likedOrNot);
 		
 		String obj = new ObjectMapper().writeValueAsString(map);
 
@@ -409,7 +449,7 @@ public class ControllerServlet {
 	@Produces("application/json")
 	public String getFeedsByMail() throws IOException
 	{
-		
+		List<Integer>totalLikes = new ArrayList<Integer>();
 //		HttpSession session = request.getSession(false);		
 		HashMap<String,Object>map = new HashMap<String, Object>();
 //		
@@ -424,15 +464,30 @@ public class ControllerServlet {
 		List<UserFeeds>fetchfeedsbymail = dao.getFeedsByMailId(email);
 		List<String>date = new ArrayList<String>();
 		List<String>time = new ArrayList<String>();
+		List<String>likedOrNot = new ArrayList<String>();
 		
 		for(UserFeeds feedbymail : fetchfeedsbymail)
 		{
+			List<String>personsWhoHadLikedTheFeed = new ArrayList<String>(feedbymail.getLikes());
 			time.add(index, dao.milliSecToTimeConversion(feedbymail.getMilliseconds()));
 			date.add(index, dao.milliSecToDateConversion(feedbymail.getMilliseconds()));
+			
+			if(personsWhoHadLikedTheFeed.contains(email))
+			{
+				totalLikes.add(personsWhoHadLikedTheFeed.size());
+				likedOrNot.add("unlike");
+			}
+			else
+			{
+				totalLikes.add(personsWhoHadLikedTheFeed.size());
+				likedOrNot.add("like");
+			}
 			
 			index++;
 		}
 		
+		map.put("totalLikes",totalLikes);
+		map.put("likedOrNot",likedOrNot);
 		map.put("fetchfeedsbymail",fetchfeedsbymail);
 		map.put("time",time);
 		map.put("date",date);
@@ -465,6 +520,107 @@ public class ControllerServlet {
 	
 	}
 	
+	
+	@Path("/likeFunction")
+	@PUT
+	@Produces("application/json")
+	public String likeFunction() throws IOException
+	{
+		List<Integer>totalLikes = new ArrayList<Integer>();
+		HttpSession session = request.getSession(false);		
+		HashMap<String,Object>map = new HashMap<String, Object>();
+		
+		String email = session.getAttribute("email").toString();
+		
+		boolean check = false;
+		
+		long uuid = Long.parseLong(request.getParameter("id"));
+		
+		UserFeeds likedFeeds = dao.queryingById(uuid);
+		
+		System.out.println("likedfeeds test"+likedFeeds.getMail());
+		ArrayList<String>myLike = new ArrayList<String>();
+
+		myLike = likedFeeds.getLikes();
+		
+		 if(myLike.contains(email))
+		{
+			check = false;
+			myLike.remove(email);
+			totalLikes.add(myLike.size());
+			likedFeeds.setLikes(myLike);
+			dao.addUserFeeds(likedFeeds);
+		}
+		else
+		{
+			check = true;
+			myLike.add(email);
+			totalLikes.add(myLike.size());
+			likedFeeds.setLikes(myLike);
+			dao.addUserFeeds(likedFeeds);
+		}
+		
+		
+		 map.put("totalLikes",totalLikes);
+		map.put("id",uuid);
+		map.put("likes", myLike);
+		map.put("check", check);
+		
+		String obj = new ObjectMapper().writeValueAsString(map);
+
+		return obj;
+	}
+	
+
+	@Path("/hoverFunction")
+	@GET
+	@Produces("application/json")
+	public String hoverFunction() throws IOException
+	{
+//		List<Integer>totalLikes = new ArrayList<Integer>();
+		HttpSession session = request.getSession(false);		
+		HashMap<String,Object>map = new HashMap<String, Object>();
+		
+//		String email = session.getAttribute("email").toString();
+		
+//		boolean check = false;
+		
+		long uuid = Long.parseLong(request.getParameter("id"));
+		
+		UserFeeds likedFeeds = dao.queryingById(uuid);
+		
+//		System.out.println("likedfeeds test"+likedFeeds.getMail());
+		ArrayList<String>myLike = new ArrayList<String>();
+
+		myLike = likedFeeds.getLikes();
+		
+//		 if(myLike.contains(email))
+//		{
+//			check = false;
+//			myLike.remove(email);
+//			totalLikes.add(myLike.size());
+//			likedFeeds.setLikes(myLike);
+//			dao.addUserFeeds(likedFeeds);
+//		}
+//		else
+//		{
+//			check = true;
+//			myLike.add(email);
+//			totalLikes.add(myLike.size());
+//			likedFeeds.setLikes(myLike);
+//			dao.addUserFeeds(likedFeeds);
+//		}
+		
+		
+//		 map.put("totalLikes",totalLikes);
+		map.put("id",uuid);
+		map.put("likes", myLike);
+//		map.put("check", check);
+		
+		String obj = new ObjectMapper().writeValueAsString(map);
+
+		return obj;
+	}
 	
 }
 

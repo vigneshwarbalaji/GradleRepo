@@ -1,11 +1,15 @@
 package com.org.dao;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import com.googlecode.objectify.ObjectifyService;
 import com.org.model.User;
@@ -108,6 +112,30 @@ public class UserServiceImpl implements UserService{
 	    return formattedDate;
 	}
 	
+	/*
+	public long timeAndDateToMillis(String myDate)
+	{
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm a");
+		sdf.setTimeZone(TimeZone.getTimeZone(ZoneId.systemDefault()));
+		Date date = null;
+		try {
+			date = sdf.parse(myDate);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		long millis = date.getTime();
+
+		return millis;
+	}*/
+	
+	public UserFeeds queryingById(long id)
+	{
+//		UserFeeds likedFeed = ObjectifyService.ofy().load().type(UserFeeds.class).filter("id",id).first().now();
+		UserFeeds likedFeed = ObjectifyService.ofy().load().type(UserFeeds.class).id(id).now();
+		
+		return likedFeed;
+	}
 	
 	@Override
 	public List<User> getAllUsers()

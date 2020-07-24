@@ -17,5 +17,7 @@ public interface UserService {
 	public String milliSecToTimeConversion(long millisec);
 	public String milliSecToDateConversion(long millisec);
 	public List<User> getAllUsers();
+	public UserFeeds queryingById(long id);
+/*	public long timeAndDateToMillis(String myDate);*/
 	
 }

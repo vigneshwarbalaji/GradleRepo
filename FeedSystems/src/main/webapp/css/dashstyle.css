@@ -16,6 +16,14 @@ body {
 }
 */
 
+.uuid
+{
+	float:right;
+	color: white;
+	font-size: 2px;
+	
+}
+
 .bluey span {
     background: transparent;
     border: none;
@@ -52,6 +60,20 @@ body {
     float: right;
 }
 
+#noAllFeeds{
+	font-size: 40px;
+	font-weight:bold;
+}
+
+#noMyFeeds{
+	font-size: 40px;
+	font-weight:bold;
+}
+
+#noFeedsInThisMail{
+	font-size: 40px;
+	font-weight:bold;
+}
 
 
 .bluey input[type="submit"] {
@@ -68,6 +90,7 @@ body {
     float: right;
 }
 .home{
+	cursor: pointer;
 	padding : 0px 15px;
 }
 
@@ -141,6 +164,7 @@ width : 95%;
 }
 
 .sideBar span {
+	cursor: pointer;
   padding: 6px 8px 6px 16px;
   text-decoration: none;
   font-size: 10px;

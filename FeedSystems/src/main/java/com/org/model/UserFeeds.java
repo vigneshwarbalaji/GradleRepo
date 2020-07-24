@@ -1,5 +1,7 @@
 package com.org.model;	
 
+import java.util.ArrayList;
+
 import com.google.appengine.api.datastore.Text;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
@@ -9,6 +11,7 @@ import com.googlecode.objectify.annotation.Index;
 @Entity
 public class UserFeeds 
 {
+	
 	@Id
 	Long Id;
 	@Index
@@ -17,8 +20,17 @@ public class UserFeeds
 	Text feed;
 	@Index
 	long milliseconds;
+	ArrayList<String> likes = new ArrayList<String>();
 	
 	
+	public ArrayList<String> getLikes() {
+		return likes;
+	}
+
+	public void setLikes(ArrayList<String> likes) {
+		this.likes = likes;
+	}
+
 	public Long getId() {
 		return Id;
 	}
