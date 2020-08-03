@@ -79,29 +79,6 @@ public class ControllerServlet {
 	}
 	
 	
-//	@Path("/Signup")
-//	@GET
-//	public String signUpPage() throws IOException
-//	{
-//		
-//		InputStream st=servletContext.getResourceAsStream("/Signup.jsp");
-//		BufferedReader buffReader = new BufferedReader(new InputStreamReader(st));
-//
-//		String string = new String();
-//		String modifiedHtml = "";
-//		while( (string = buffReader.readLine() ) != null){
-//		modifiedHtml=modifiedHtml+string;
-//		}
-//
-//		buffReader.close();
-//		st.close();
-//		
-//		
-//		
-//		return modifiedHtml;
-//		
-//	}
-	
 	@Path("/Dashboard")
 	@GET
 	public String DashBoardPage() throws IOException
@@ -452,11 +429,7 @@ public class ControllerServlet {
 		List<Integer>totalLikes = new ArrayList<Integer>();
 //		HttpSession session = request.getSession(false);		
 		HashMap<String,Object>map = new HashMap<String, Object>();
-//		
-//		
-//		List<User>allusers = dao.getAllUsers();
-//		
-//		map.put("allusers",allusers);
+
 		int index = 0;
 		
 		String email = request.getParameter("email");
@@ -589,33 +562,13 @@ public class ControllerServlet {
 		
 		UserFeeds likedFeeds = dao.queryingById(uuid);
 		
-//		System.out.println("likedfeeds test"+likedFeeds.getMail());
 		ArrayList<String>myLike = new ArrayList<String>();
 
 		myLike = likedFeeds.getLikes();
 		
-//		 if(myLike.contains(email))
-//		{
-//			check = false;
-//			myLike.remove(email);
-//			totalLikes.add(myLike.size());
-//			likedFeeds.setLikes(myLike);
-//			dao.addUserFeeds(likedFeeds);
-//		}
-//		else
-//		{
-//			check = true;
-//			myLike.add(email);
-//			totalLikes.add(myLike.size());
-//			likedFeeds.setLikes(myLike);
-//			dao.addUserFeeds(likedFeeds);
-//		}
-		
-		
-//		 map.put("totalLikes",totalLikes);
+
 		map.put("id",uuid);
 		map.put("likes", myLike);
-//		map.put("check", check);
 		
 		String obj = new ObjectMapper().writeValueAsString(map);
 
